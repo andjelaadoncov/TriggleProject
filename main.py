@@ -1,7 +1,8 @@
 from collections import OrderedDict
 def draw_hexagon(side_length):
     # Ukupna visina matrice (gornji deo + donji deo - 1, jer sredina se ponavlja)
-    height = 2 * side_length - 1
+
+    height = 3 * side_length + 2
     width = 3 * side_length + 2  # Širina matrice
 
     # Kreiraj matricu dimenzija height x width ispunjenu praznim karakterima
@@ -9,31 +10,33 @@ def draw_hexagon(side_length):
 
     # Lista za čuvanje čvorova (sa slovima za redove)
     nodes = {}
+    ii=0
+    for i in range(0,int(height / 2) ,2):
 
-
-    for i in range(int(height / 2) + 1):
-        dots=side_length+i
-        start=side_length-i-1
-        end=width-dots+2*i+1
+        dots=side_length+ii
+        start=side_length-ii-1
+        end=width-dots+2*ii+1
         k=1
         for j in range(start,end,2):
             matrix[i][j] = "●"
             matrix[height-i-1][j] = "●"
 
-            row_label = chr(65 + i)
+            row_label = chr(65 + ii)
             node_label=f"{row_label}{k}"
             nodes[node_label]=(i,j)
 
-            row_label = chr(65 + (height-i-1))
+            row_label = chr(65 + (int(height/2)-ii))
             node_label = f"{row_label}{k}"
-            nodes[node_label] = ((height-i-1),j)
+            nodes[node_label] = (int(height/2)-ii,j)
             k+=1
-
-        for j in range(0,width, 2):
-            matrix[int(height/2)][j] = "●"
-            row_label = chr(65 + int(height/2))
-            node_label = f"{row_label}{j}"
-            nodes[node_label] = (int(height/2),j)
+        ii+=1
+    ii=1
+    row_label = chr(65 + int((height/2)/2))
+    for j in range(0,width, 2):
+        matrix[int(height/2)][j] = "●"
+        node_label = f"{row_label}{ii}"
+        nodes[node_label] = (int(height/2),j)
+        ii+=1
 
     nodes = OrderedDict(sorted(nodes.items()))
     print("Pozicije tačaka u matrici:")
@@ -50,8 +53,8 @@ def play_move(matrix, nodes, start, direction):
     # Direkcije definisane kao pomeraji u matrici
     directions = {
         "D": (0, 2),      # Desno (isti red)
-        "DD": (1, 1),     # Dole desno
-        "DL": (1, -1)      # Dole levo
+        "DD": (2, 1),     # Dole desno
+        "DL": (2, -1)      # Dole levo
     }
 
     if start not in nodes or direction not in directions:
@@ -79,6 +82,72 @@ def print_board(matrix):
         print(" ".join(row))
 
 
+def is_valid_position(matrix, x, y):
+    return 0 <= x < len(matrix) and 0 <= y < len(matrix[0])
+
+
+def draw_triangle(matrix, nodes):
+    for node_label, (i, j) in nodes.items():
+        if(is_valid_position(matrix, i, j) and matrix[i][j]=="■"):
+            # Proveri gornji trougao
+            if (is_valid_position(matrix, i - 2, j - 1) and
+                    is_valid_position(matrix, i - 2, j + 1) and
+                    matrix[i - 2][j - 1] == "■" and
+                    matrix[i - 2][j + 1] == "■" and
+                    is_valid_position(matrix, i - 1, j)):
+                matrix[i - 1][j] = "▲"
+
+            # Proveri donji trougao
+            if (is_valid_position(matrix, i + 2, j - 1) and
+                    is_valid_position(matrix, i + 2, j + 1) and
+                    matrix[i + 2][j - 1] == "■" and
+                    matrix[i + 2][j + 1] == "■" and
+                    is_valid_position(matrix, i + 1, j)):
+                matrix[i + 1][j] = "▲"
+
+            # Proveri levi trougao
+            if (is_valid_position(matrix, i - 2, j - 1) and
+                    is_valid_position(matrix, i + 2, j - 1) and
+                    matrix[i - 2][j - 1] == "■" and
+                    matrix[i + 2][j - 1] == "■" and
+                    is_valid_position(matrix, i, j - 1)):
+                matrix[i][j - 1] = "▲"
+
+            # Proveri desni trougao
+            if (is_valid_position(matrix, i - 2, j + 1) and
+                    is_valid_position(matrix, i + 2, j + 1) and
+                    matrix[i - 2][j + 1] == "■" and
+                    matrix[i + 2][j + 1] == "■" and
+                    is_valid_position(matrix, i, j + 1)):
+                matrix[i][j + 1] = "▲"
+                # LEVO GORE
+            if (is_valid_position(matrix, i - 2, j - 1) and
+                    is_valid_position(matrix, i , j -2) and
+                    matrix[i - 2][j - 1] == "■" and
+                    matrix[i][j - 2] == "■" and
+                    is_valid_position(matrix, i, j - 1)):
+                matrix[i-1][j - 1] = "▲"
+            #levo dole
+            if (is_valid_position(matrix, i+2, j - 2) and
+                    is_valid_position(matrix, i, j - 2) and
+                    matrix[i - 2][j - 1] == "■" and
+                    matrix[i][j - 2] == "■" and
+                    is_valid_position(matrix, i-1, j - 1)):
+                matrix[i-1][j - 1] = "▲"
+            #desno gore
+            if (is_valid_position(matrix, i - 2, j + 1) and
+                    is_valid_position(matrix, i, j + 2) and
+                    matrix[i - 2][j + 1] == "■" and
+                    matrix[i][j + 2] == "■" and
+                    is_valid_position(matrix, i-1, j + 1)):
+                matrix[i-1][j + 1] = "▲"
+            #desno dole
+            if (is_valid_position(matrix, i + 2, j + 1) and
+                    is_valid_position(matrix, i, j + 2) and
+                    matrix[i + 2][j + 1] == "■" and
+                    matrix[i][j + 2] == "■" and
+                    is_valid_position(matrix, i+1, j + 1)):
+                matrix[i+1][j + 1] = "▲"
 # Main
 
 side_length = int(input("Unesite dužinu stranice heksagona: "))
@@ -95,6 +164,7 @@ if side_length<9 and side_length>3:
         try:
             start, direction = move.split()
             play_move(matrix, nodes, start, direction)
+            draw_triangle(matrix, nodes)
             print_board(matrix)
         except ValueError:
             print("Unesite potez u ispravnom formatu!")
