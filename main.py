@@ -29,11 +29,11 @@ def draw_hexagon(side_length):
             nodes[node_label] = ((height-i-1),j)
             k+=1
 
-    for j in range(0,width, 2):
-         matrix[int(height/2)][j] = "●"
-         row_label = chr(65 + int(height/2))
-         node_label = f"{row_label}{j}"
-         nodes[node_label] = (int(height/2),j)
+        for j in range(0,width, 2):
+            matrix[int(height/2)][j] = "●"
+            row_label = chr(65 + int(height/2))
+            node_label = f"{row_label}{j}"
+            nodes[node_label] = (int(height/2),j)
 
     nodes = OrderedDict(sorted(nodes.items()))
     print("Pozicije tačaka u matrici:")
@@ -82,18 +82,21 @@ def print_board(matrix):
 # Main
 
 side_length = int(input("Unesite dužinu stranice heksagona: "))
-matrix, nodes = draw_hexagon(side_length)
-print_board(matrix)
-print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
-print(f"Visina matrice: {len(matrix)}")
-while True:
-    print("\nČvorovi: ", ", ".join(nodes.keys()))
-    move = input("Unesite potez (format: čvor direkcija, npr. A1 D): ").strip().upper()
-    if move == "EXIT":
-        break
-    try:
-        start, direction = move.split()
-        play_move(matrix, nodes, start, direction)
-        print_board(matrix)
-    except ValueError:
-        print("Unesite potez u ispravnom formatu!")
+if side_length<9 and side_length>3:
+    matrix, nodes = draw_hexagon(side_length)
+    print_board(matrix)
+    print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
+    print(f"Visina matrice: {len(matrix)}")
+    while True:
+        print("\nČvorovi: ", ", ".join(nodes.keys()))
+        move = input("Unesite potez (format: čvor direkcija, npr. A1 D): ").strip().upper()
+        if move == "EXIT":
+            break
+        try:
+            start, direction = move.split()
+            play_move(matrix, nodes, start, direction)
+            print_board(matrix)
+        except ValueError:
+            print("Unesite potez u ispravnom formatu!")
+else:
+    print("Tabla nije odgovarajuce velicine!")
