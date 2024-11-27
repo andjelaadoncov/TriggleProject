@@ -59,7 +59,7 @@ def play_move(matrix, nodes, start, direction):
 
     if start not in nodes or direction not in directions:
         print("Nevalidan potez!")
-        return
+        return False
 
     # Dobij početne koordinate
     x, y = nodes[start]
@@ -73,8 +73,11 @@ def play_move(matrix, nodes, start, direction):
         # Ako su sve pozicije validne, postavi kvadratiće
         for px, py in positions:
             matrix[px][py] = "■"
+
+        return True
     else:
         print("Potez izlazi izvan granica ili prelazi nepostojeći čvor!")
+        return False
 
 
 def print_board(matrix):
@@ -148,25 +151,62 @@ def draw_triangle(matrix, nodes):
                     matrix[i][j + 2] == "■" and
                     is_valid_position(matrix, i+1, j + 1)):
                 matrix[i+1][j + 1] = "▲"
+
+def switch_player(current_player):
+    return "računar" if current_player == "čovek" else "čovek"
+
 # Main
 
 side_length = int(input("Unesite dužinu stranice heksagona: "))
-if side_length<9 and side_length>3:
+if 3 < side_length < 9:
     matrix, nodes = draw_hexagon(side_length)
     print_board(matrix)
     print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
     print(f"Visina matrice: {len(matrix)}")
+
+    player_choice = input("Ko igra prvi (čovek/računar)? ").strip().lower()
+    while player_choice not in ["čovek", "računar"]:
+        player_choice = input("Unesite 'čovek' ili 'računar': ").strip().lower()
+
+    first_symbol = input("Koji simbol igra prvi (X/O)? ").strip().upper()
+    while first_symbol not in ["X", "O"]:
+        first_symbol = input("Unesite 'X' ili 'O': ").strip().upper()
+
+    second_symbol = "O" if first_symbol == "X" else "X"
+    current_player = player_choice
+    symbols = {"čovek": first_symbol, "računar": second_symbol}
+
     while True:
-        print("\nČvorovi: ", ", ".join(nodes.keys()))
+        #print("\nČvorovi: ", ", ".join(nodes.keys()))
+        print(f"Na potezu: {current_player} ({symbols[current_player]})")
         move = input("Unesite potez (format: čvor direkcija, npr. A1 D): ").strip().upper()
         if move == "EXIT":
             break
-        try:
-            start, direction = move.split()
-            play_move(matrix, nodes, start, direction)
-            draw_triangle(matrix, nodes)
-            print_board(matrix)
-        except ValueError:
-            print("Unesite potez u ispravnom formatu!")
+        if(current_player == "čovek"):
+            try:
+                start, direction = move.split()
+                valid = play_move(matrix, nodes, start, direction)
+                draw_triangle(matrix, nodes)
+                print_board(matrix)
+
+                if valid:
+                    current_player = switch_player(current_player)
+
+            except ValueError:
+                print("Unesite potez u ispravnom formatu!")
+        else:
+            #logika za kompjuter
+            try:
+                start, direction = move.split()
+                valid = play_move(matrix, nodes, start, direction)
+                draw_triangle(matrix, nodes)
+                print_board(matrix)
+
+                if (valid):
+                    current_player = switch_player(current_player)
+
+            except ValueError:
+                print("Unesite potez u ispravnom formatu!")
+
 else:
     print("Tabla nije odgovarajuce velicine!")
