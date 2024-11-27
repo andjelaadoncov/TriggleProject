@@ -102,6 +102,19 @@ def play_move(matrix, nodes, start, direction):
         print("Potez izlazi izvan granica ili prelazi nepostojeći čvor!")
         return False
 
+def draw_triangle(matrix):
+    for i in range(1, len(matrix), 2):
+        for j in range(len(matrix[0])):
+            if is_valid_position(matrix,i,j):
+               if (is_valid_position(matrix, i + 1, j)
+                    and is_valid_position(matrix,j,i-1)
+                    and is_valid_position(matrix,i, j+1)):
+                   if ("/" in matrix[i][j - 1] and "\\" in matrix[i][j + 1] and "-" in matrix[i + 1][j]):
+                       matrix[i][j] = "▲"
+                   if is_valid_position(matrix, i - 1, j):
+                       if ("\\" in matrix[i][j] and "/" in matrix[i][j] and "-" in matrix[i - 1][j]):
+                           matrix[i][j] = "\\▼/"
+
 
 def print_board(matrix):
     for row in matrix:
@@ -146,7 +159,7 @@ if 3 < side_length < 9:
             try:
                 start, direction = move.split()
                 valid = play_move(matrix, nodes, start, direction)
-              #  draw_triangle(matrix, nodes)
+                draw_triangle(matrix)
                 print_board(matrix)
 
                 if valid:
@@ -159,7 +172,7 @@ if 3 < side_length < 9:
             try:
                 start, direction = move.split()
                 valid = play_move(matrix, nodes, start, direction)
-                #draw_triangle(matrix, nodes)
+                draw_triangle(matrix)
                 print_board(matrix)
 
                 if (valid):
