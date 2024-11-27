@@ -42,7 +42,6 @@ def draw_hexagon(side_length):
     print("Pozicije tačaka u matrici:")
     for node_label, (i, j) in nodes.items():
         print(f"{node_label}: red = {i}, kolona = {j}")
-
     return matrix, nodes
 
 def is_valid_move(matrix, x, y):
@@ -62,18 +61,42 @@ def play_move(matrix, nodes, start, direction):
         return False
 
     # Dobij početne koordinate
-    x, y = nodes[start]
     dx, dy = directions[direction]
+    x, y = nodes[start]
 
     # Iteracija kroz 4 poteza
     positions = [(x + dx * i, y + dy * i) for i in range(4)]
+    if direction == "D":
+        line="-"
+        y+=1
+    else:
+        if direction == "DD":
+            line="\\"
+            y+=1
+        else:
+            line="/"
+            y-=1
+        x+=1
+
 
     # Provera da li su sve pozicije validne
     if all(is_valid_move(matrix, px, py) for px, py in positions):
-        # Ako su sve pozicije validne, postavi kvadratiće
-        for px, py in positions:
-            matrix[px][py] = "■"
-
+        for i in range(3):
+            if direction == "DL" and "/" not in matrix[x][y] :
+                if matrix[x][y] == " ":
+                    matrix[x][y] = line
+                else :
+                    matrix[x][y] = matrix[x][y] + line
+            else:
+                if direction == "DD" and "\\" not in matrix[x][y] :
+                    if matrix[x][y] == " ":
+                        matrix[x][y] = line
+                    else:
+                        matrix[x][y] = line + matrix[x][y]
+                else:
+                    matrix[x][y] = line
+            x += dx
+            y += dy
         return True
     else:
         print("Potez izlazi izvan granica ili prelazi nepostojeći čvor!")
@@ -89,71 +112,8 @@ def is_valid_position(matrix, x, y):
     return 0 <= x < len(matrix) and 0 <= y < len(matrix[0])
 
 
-def draw_triangle(matrix, nodes):
-    for node_label, (i, j) in nodes.items():
-        if(is_valid_position(matrix, i, j) and matrix[i][j]=="■"):
-            # Proveri gornji trougao
-            if (is_valid_position(matrix, i - 2, j - 1) and
-                    is_valid_position(matrix, i - 2, j + 1) and
-                    matrix[i - 2][j - 1] == "■" and
-                    matrix[i - 2][j + 1] == "■" and
-                    is_valid_position(matrix, i - 1, j)):
-                matrix[i - 1][j] = "▲"
-
-            # Proveri donji trougao
-            if (is_valid_position(matrix, i + 2, j - 1) and
-                    is_valid_position(matrix, i + 2, j + 1) and
-                    matrix[i + 2][j - 1] == "■" and
-                    matrix[i + 2][j + 1] == "■" and
-                    is_valid_position(matrix, i + 1, j)):
-                matrix[i + 1][j] = "▲"
-
-            # Proveri levi trougao
-            if (is_valid_position(matrix, i - 2, j - 1) and
-                    is_valid_position(matrix, i + 2, j - 1) and
-                    matrix[i - 2][j - 1] == "■" and
-                    matrix[i + 2][j - 1] == "■" and
-                    is_valid_position(matrix, i, j - 1)):
-                matrix[i][j - 1] = "▲"
-
-            # Proveri desni trougao
-            if (is_valid_position(matrix, i - 2, j + 1) and
-                    is_valid_position(matrix, i + 2, j + 1) and
-                    matrix[i - 2][j + 1] == "■" and
-                    matrix[i + 2][j + 1] == "■" and
-                    is_valid_position(matrix, i, j + 1)):
-                matrix[i][j + 1] = "▲"
-                # LEVO GORE
-            if (is_valid_position(matrix, i - 2, j - 1) and
-                    is_valid_position(matrix, i , j -2) and
-                    matrix[i - 2][j - 1] == "■" and
-                    matrix[i][j - 2] == "■" and
-                    is_valid_position(matrix, i, j - 1)):
-                matrix[i-1][j - 1] = "▲"
-            #levo dole
-            if (is_valid_position(matrix, i+2, j - 2) and
-                    is_valid_position(matrix, i, j - 2) and
-                    matrix[i - 2][j - 1] == "■" and
-                    matrix[i][j - 2] == "■" and
-                    is_valid_position(matrix, i-1, j - 1)):
-                matrix[i-1][j - 1] = "▲"
-            #desno gore
-            if (is_valid_position(matrix, i - 2, j + 1) and
-                    is_valid_position(matrix, i, j + 2) and
-                    matrix[i - 2][j + 1] == "■" and
-                    matrix[i][j + 2] == "■" and
-                    is_valid_position(matrix, i-1, j + 1)):
-                matrix[i-1][j + 1] = "▲"
-            #desno dole
-            if (is_valid_position(matrix, i + 2, j + 1) and
-                    is_valid_position(matrix, i, j + 2) and
-                    matrix[i + 2][j + 1] == "■" and
-                    matrix[i][j + 2] == "■" and
-                    is_valid_position(matrix, i+1, j + 1)):
-                matrix[i+1][j + 1] = "▲"
-
 def switch_player(current_player):
-    return "računar" if current_player == "čovek" else "čovek"
+    return "racunar" if current_player == "covek" else "covek"
 
 # Main
 
@@ -165,7 +125,7 @@ if 3 < side_length < 9:
     print(f"Visina matrice: {len(matrix)}")
 
     player_choice = input("Ko igra prvi (čovek/računar)? ").strip().lower()
-    while player_choice not in ["čovek", "računar"]:
+    while player_choice not in ["covek", "racunar"]:
         player_choice = input("Unesite 'čovek' ili 'računar': ").strip().lower()
 
     first_symbol = input("Koji simbol igra prvi (X/O)? ").strip().upper()
@@ -174,7 +134,7 @@ if 3 < side_length < 9:
 
     second_symbol = "O" if first_symbol == "X" else "X"
     current_player = player_choice
-    symbols = {"čovek": first_symbol, "računar": second_symbol}
+    symbols = {"covek": first_symbol, "racunar": second_symbol}
 
     while True:
         #print("\nČvorovi: ", ", ".join(nodes.keys()))
@@ -182,11 +142,11 @@ if 3 < side_length < 9:
         move = input("Unesite potez (format: čvor direkcija, npr. A1 D): ").strip().upper()
         if move == "EXIT":
             break
-        if(current_player == "čovek"):
+        if(current_player == "covek"):
             try:
                 start, direction = move.split()
                 valid = play_move(matrix, nodes, start, direction)
-                draw_triangle(matrix, nodes)
+              #  draw_triangle(matrix, nodes)
                 print_board(matrix)
 
                 if valid:
@@ -199,7 +159,7 @@ if 3 < side_length < 9:
             try:
                 start, direction = move.split()
                 valid = play_move(matrix, nodes, start, direction)
-                draw_triangle(matrix, nodes)
+                #draw_triangle(matrix, nodes)
                 print_board(matrix)
 
                 if (valid):
