@@ -2,7 +2,7 @@ from collections import OrderedDict
 def draw_hexagon(side_length):
     # Ukupna visina matrice (gornji deo + donji deo - 1, jer sredina se ponavlja)
 
-    height = 3 * side_length + 2
+    height = 2*(2*side_length-1)-1
     width = 3 * side_length + 2  # Širina matrice
 
     # Kreiraj matricu dimenzija height x width ispunjenu praznim karakterima
