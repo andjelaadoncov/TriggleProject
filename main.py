@@ -1,4 +1,50 @@
 from collections import OrderedDict
+def parse_matrix(matrix_str):
+    rows = matrix_str.split("\n")
+    matrix = [list(row) for row in rows]
+    side_length = matrix_str[0].count("●")
+    height = 3 * (2 * side_length - 2) + 1
+    width = 6 * (2 * side_length - 2) + 1  # Širina matrice
+    nodes = {}
+    dots = side_length - 1
+    start = int(width / 4) + 3
+    end = int(3 * width / 4) - 2
+    hpom = height - 1 + 3
+    ii = 0
+    for i in range(0, int(height / 2), 3):
+        dots += 1
+        start -= 3
+        end += 3
+        hpom -= 3
+        jj = 1
+        for j in range(start, end, 6):
+            matrix[i][j] = "●"
+            matrix[hpom][j] = "●"
+
+            row_label = chr(65 + ii)
+            node_label = f"{row_label}{jj}"
+            nodes[node_label] = (i, j)
+
+            row_label = chr(65 + (2 * side_length - 2 - ii))
+            node_label = f"{row_label}{jj}"
+            nodes[node_label] = (height - 1 - i, j)
+            jj += 1
+        ii += 1
+    jj = 1
+    for j in range(0, width, 6):
+        matrix[int(height / 2)][j] = "●"
+        row_label = chr(65 + ii)
+        node_label = f"{row_label}{jj}"
+        nodes[node_label] = (int(height / 2), j)
+        jj += 1
+
+    nodes = OrderedDict(sorted(nodes.items()))
+    print("Pozicije tačaka u matrici:")
+    for node_label, (i, j) in nodes.items():
+        print(f"{node_label}: red = {i}, kolona = {j}")
+    return matrix, nodes
+
+
 def draw_hexagon(side_length):
     # Ukupna visina matrice (gornji deo + donji deo - 1, jer sredina se ponavlja)
 
@@ -15,7 +61,6 @@ def draw_hexagon(side_length):
     end = int(3*width/4) -2
     hpom=height-1+3
     ii=0
-
     for i in range(0,int(height / 2) ,3):
         dots+=1
         start-=3
@@ -30,9 +75,9 @@ def draw_hexagon(side_length):
             node_label=f"{row_label}{jj}"
             nodes[node_label]=(i,j)
 
-            row_label = chr(65 + (2*side_length-1-ii))
+            row_label = chr(65 + (2*side_length-2-ii))
             node_label = f"{row_label}{jj}"
-            nodes[node_label] = (2*side_length-1-ii,j)
+            nodes[node_label] = (height-1-i,j)
             jj+=1
         ii+=1
     jj=1
@@ -113,8 +158,7 @@ def draw_triangle(matrix, symbol, count,max_triangles):
     return count
 
 
-def print_board(matrix,nodes):
-    x, y = nodes["A1"]
+def print_board(matrix,y):
     first_row = [" "] * (y + 3)  # Prva prazna mesta do x+2
     col_num = 1
     for i in range(y + 3, y+3+len(matrix[0])):  # Numeracija počinje od x+3 na svakom 6. mestu
@@ -139,13 +183,42 @@ def switch_player(current_player):
 
 
 # Main
+#
+# matrix_str = """          ●-----●-----●-----●
+#           / \
+#          / O \
+#        ●-----●-----●-----●     ●
+#        / \ O / \ X /
+#       / O \ / X \ /
+#     ●-----●-----●-----●     ●     ●
+#     /     / \ O / \
+#    /     /   \ /   \
+#  ●     ●     ●     ●     ●     ●     ●
+#        /     / \
+#       /     /   \
+#     ●     ●     ●     ●     ●     ●
+#
+#
+#        ●     ●     ●     ●     ●
+#
+#
+#           ●     ●     ●     ● """
+#
+# # Parsiraj matricu
+#
+# matrix, nodes = parse_matrix(matrix_str)
+# print_board(matrix,9)
+# print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
+# print(f"Visina matrice: {len(matrix)}")
 
 side_length = int(input("Unesite dužinu stranice heksagona: "))
 if 3 < side_length < 9:
     matrix, nodes = draw_hexagon(side_length)
-    print_board(matrix,nodes)
+    xp, yp = nodes["A1"]
+    print_board(matrix,yp)
     print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
     print(f"Visina matrice: {len(matrix)}")
+
 
     max_triangles =0
     for i in range(side_length,2*side_length-2):
@@ -176,7 +249,7 @@ if 3 < side_length < 9:
                 valid = play_move(matrix, nodes, start, direction)
                 if valid:
                     symbols[current_player]["count"]=draw_triangle(matrix, symbols[current_player]["symbol"],symbols[current_player]["count"],max_triangles)  # Dodavanje simbola
-                    print_board(matrix,nodes)
+                    print_board(matrix,yp)
                     current_player = switch_player(current_player)
             except ValueError:
                 print("Unesite potez u ispravnom formatu!")
@@ -187,7 +260,7 @@ if 3 < side_length < 9:
                 valid = play_move(matrix, nodes, start, direction)
                 if valid:
                     symbols[current_player]["count"]= draw_triangle(matrix, symbols[current_player]["symbol"],symbols[current_player]["count"],max_triangles)  # Dodavanje simbola
-                    print_board(matrix,nodes)
+                    print_board(matrix,yp)
                     current_player = switch_player(current_player)
             except ValueError:
                 print("Unesite potez u ispravnom formatu!")
