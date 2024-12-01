@@ -321,8 +321,6 @@ if 3 < side_length < 9:
                     current_player = switch_player(current_player)
             except ValueError:
                 print("Unesite potez u ispravnom formatu!")
-
-
 else:
     print("Tabla nije odgovarajuce velicine!")
 
