@@ -73,7 +73,7 @@ if 3 < side_length < 9:
             except ValueError:
                 print("Unesite potez u ispravnom formatu!")
         else:
-            # Logika za kompjuter
+            #ovo je deo kad kompjuter igra -->sl faza izmena
             try:
                 start, direction = move.split()
                 valid = play_move(matrix, nodes, start, direction)

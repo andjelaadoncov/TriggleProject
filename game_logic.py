@@ -2,31 +2,29 @@
 from utilities import max_connections
 
 def is_valid_move(matrix, x, y):
-    """Provera da li je koordinata (x, y) unutar granica matrice i da li postoji čvor"""
     return 0 <= x < len(matrix) and 0 <= y < len(matrix[0])
 
 def play_move(matrix, nodes, start, direction):
-    # Directions defined as matrix moves
-    directions = {"D", "DD", "DL"}  # Right, Down-Right, Down-Left
+    directions = {"D", "DD", "DL"}  # desno, dole desno, dole levo
 
     if start not in nodes or direction not in directions:
         print("Nevalidan potez!")
         return False
 
-    # Get initial coordinates
+
     x, y = nodes[start]
     positions = []
 
     if direction == "D":
         line = "-"
-        for dy in range(1, 18):  # Start from 1 to skip initial node
+        for dy in range(1, 18):
             if dy % 6 != 0:
                 positions.append((x, y + dy))
         positions.append((x, y + 18))
     elif direction == "DD":
         line = "\\"
-        for dx in range(1, 9):  # Start from 1 to skip initial node
-            dy = dx  # Equal step for Down-Right
+        for dx in range(1, 9):
+            dy = dx
             if dx % 3 != 0:
                 positions.append((x + dx, y + dy))
 
@@ -34,13 +32,13 @@ def play_move(matrix, nodes, start, direction):
 
     elif direction == "DL":
         line = "/"
-        for dx in range(1, 9):  # Start from 1 to skip initial node
-            dy = dx  # Equal step for Down-Left
+        for dx in range(1, 9):
+            dy = dx
             if dx % 3 != 0:
                 positions.append((x + dx, y - dy))
         positions.append((x+9, y - 9))
     last_px, last_py = positions[-1]
-    # Validate all positions and update the matrix if valid
+
     if all(is_valid_move(matrix, px, py) for px, py in positions) and  matrix[last_px][last_py] == "●":
         positions.pop()
         for px, py in positions:

@@ -6,7 +6,7 @@ def parse_matrix(matrix_str):
     matrix = [list(row) for row in rows]
     side_length = matrix_str[0].count("●")
     height = 3 * (2 * side_length - 2) + 1
-    width = 6 * (2 * side_length - 2) + 1  # Širina matrice
+    width = 6 * (2 * side_length - 2) + 1
     nodes = {}
     dots = side_length - 1
     start = int(width / 4) + 3
@@ -48,15 +48,15 @@ def parse_matrix(matrix_str):
 
 
 def draw_hexagon(side_length):
-    # Ukupna visina matrice (gornji deo + donji deo - 1, jer sredina se ponavlja)
+    # ukupna visina matrice (gornji deo + donji deo - 1, jer sredina se ponavlja)
 
     height = 3*(2*side_length-2)+1
-    width = 6*(2*side_length-2)+1 # Širina matrice
+    width = 6*(2*side_length-2)+1
 
-    # Kreiraj matricu dimenzija height x width ispunjenu praznim karakterima
+
     matrix = [[" " for _ in range(width)] for _ in range(height)]
 
-    # Lista za čuvanje čvorova (sa slovima za redove)
+
     nodes = {}
     dots =side_length-1
     start=int(width/4)+3
@@ -97,10 +97,10 @@ def draw_hexagon(side_length):
     return matrix, nodes
 
 def print_board(matrix,y):
-    first_row = [" "] * (y + 1)  # Prva prazna mesta do x+2
+    first_row = [" "] * (y + 1)
     col_num = 1
-    for i in range(y + 2, y+2+len(matrix[0])):  # Numeracija počinje od x+3 na svakom 6. mestu
-        if (i - (y + 2)) % 6 == 0:  # Dodajemo broj na svakom 6. mestu
+    for i in range(y + 2, y+2+len(matrix[0])):
+        if (i - (y + 2)) % 6 == 0:
             first_row.append(str(col_num))
             col_num += 1
         else:
@@ -109,16 +109,16 @@ def print_board(matrix,y):
     print("  " + "".join(first_row))
 
     for index, row in enumerate(matrix):
-        row = [str(cell) for cell in row]  # Obezbeđujemo da su svi elementi stringovi
+        row = [str(cell) for cell in row]
 
         if index % 3 == 0:
-            print(chr(65 + index // 3) + " " + "".join(row))  # Ispisujemo red sa oznakom
+            print(chr(65 + index // 3) + " " + "".join(row))
         else:
             print("  " + "".join(row))
-    last_row = [" "] * (y + 1)  # Prva prazna mesta do x+2
+    last_row = [" "] * (y + 1)
     col_num = 1
-    for i in range(y + 2, y + 2 + len(matrix[0])):  # Numeracija počinje od x+3 na svakom 6. mestu
-        if (i - (y + 2)) % 6 == 0:  # Dodajemo broj na svakom 6. mestu
+    for i in range(y + 2, y + 2 + len(matrix[0])):
+        if (i - (y + 2)) % 6 == 0:
             last_row.append(str(col_num))
             col_num += 1
         else:
