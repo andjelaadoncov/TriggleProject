@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 def parse_matrix(matrix_str):
     rows = matrix_str.split("\n")
     matrix = [list(row) for row in rows]
@@ -137,12 +138,9 @@ def play_move(matrix, nodes, start, direction):
         print("Potez izlazi izvan granica ili prelazi nepostojeći čvor!")
         return False
 
-def draw_triangle(matrix, symbol, count,max_triangles):
+def draw_triangle(matrix, symbol, count):
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
-            if count >= max_triangles:
-                print("Kraj igre! Maksimalni broj trouglova je dostignut.")
-                return count
             if matrix[i][j] == " ":
                 if (is_valid_move(matrix, i - 1, j + 1) and matrix[i - 1][j + 1] == "\\" and
                         is_valid_move(matrix, i - 1, j - 1) and matrix[i - 1][j - 1] == "/" and
@@ -159,16 +157,17 @@ def draw_triangle(matrix, symbol, count,max_triangles):
 
 
 def print_board(matrix,y):
-    first_row = [" "] * (y + 3)  # Prva prazna mesta do x+2
+    first_row = [" "] * (y + 1)  # Prva prazna mesta do x+2
     col_num = 1
-    for i in range(y + 3, y+3+len(matrix[0])):  # Numeracija počinje od x+3 na svakom 6. mestu
-        if (i - (y + 3)) % 6 == 0:  # Dodajemo broj na svakom 6. mestu
+    for i in range(y + 2, y+2+len(matrix[0])):  # Numeracija počinje od x+3 na svakom 6. mestu
+        if (i - (y + 2)) % 6 == 0:  # Dodajemo broj na svakom 6. mestu
             first_row.append(str(col_num))
             col_num += 1
         else:
             first_row.append(" ")
 
     print("  " + "".join(first_row))
+
     for index, row in enumerate(matrix):
         row = [str(cell) for cell in row]  # Obezbeđujemo da su svi elementi stringovi
 
@@ -176,24 +175,64 @@ def print_board(matrix,y):
             print(chr(65 + index // 3) + " " + "".join(row))  # Ispisujemo red sa oznakom
         else:
             print("  " + "".join(row))
+    last_row = [" "] * (y + 1)  # Prva prazna mesta do x+2
+    col_num = 1
+    for i in range(y + 2, y + 2 + len(matrix[0])):  # Numeracija počinje od x+3 na svakom 6. mestu
+        if (i - (y + 2)) % 6 == 0:  # Dodajemo broj na svakom 6. mestu
+            last_row.append(str(col_num))
+            col_num += 1
+        else:
+            last_row.append(" ")
+
+    print("  " + "".join(last_row))
 
 def switch_player(current_player):
     return "racunar" if current_player == "covek" else "covek"
+
+def max_connections(side_length):
+    conn = 0
+    for i in range(side_length, 2*side_length - 1):
+        conn+=2*i+i-1
+    conn+=2*side_length-1
+    return conn
+
+
+def end_of_game(matrix, count, side_length):
+    if count >= max_triangles:
+        print("Kraj igre! Maksimalni broj trouglova je dostignut.")
+        return True
+    else:
+        p = 0
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                if matrix[i][j] == "●":
+                    if (is_valid_move(matrix, i + 1, j - 1) and matrix[i + 1][j - 1] == "/"):
+                        p += 1
+                    if (is_valid_move(matrix, i + 1, j + 1) and matrix[i + 1][j + 1] == "\\"):
+                        p += 1
+                    if (is_valid_move(matrix, i, j + 1) and matrix[i][j + 1] == "-"):
+                        p += 1
+        if p == max_connections(side_length):
+            print("Kraj igre! Maksimalni broj gumica je razvucen")
+            return True
+        return False
+
+
 
 
 
 # Main
 
 # matrix_str = """          ●-----●-----●-----●
-#           / \\
-#          / O \\
-#        ●-----●-----●-----●     ●
-#        / \\ O / \\ X /
-#       / O \\ / X \\ /
-#     ●-----●-----●-----●     ●     ●
-#     /     / \\ O / \\
-#    /     /   \\ /   \\
-#  ●     ●     ●     ●     ●     ●     ●
+#           / \\  /\\  /\\  /\\
+#          / O \\/  \\/  \\/  \\
+#        ●-----●-----●-----●-----●
+#        / \\ O / \\ X /\\  /\\  /\\
+#       / O \\ / X \\ /  \\/  \\/  \\
+#     ●-----●-----●-----●-----●-----●
+#     / \\   / \\ O / \\ /\\  /\\  /\\
+#    /   \\/   \\ /   \\/  \\/  \\/  \\
+#  ●-----●-----●-----●-----●-----●-----●
 #        /     / \\
 #       /     /   \\
 #     ●     ●     ●     ●     ●     ●
@@ -261,6 +300,9 @@ if 3 < side_length < 9:
                 if valid:
                     symbols[current_player]["count"]= draw_triangle(matrix, symbols[current_player]["symbol"],symbols[current_player]["count"],max_triangles)  # Dodavanje simbola
                     print_board(matrix,yp)
+                    if end_of_game(matrix, symbols[current_player]["count"], max_triangles, side_length):
+                        print(f"Pobedio je {current_player}!")
+                        break
                     current_player = switch_player(current_player)
             except ValueError:
                 print("Unesite potez u ispravnom formatu!")
