@@ -116,21 +116,27 @@ def play_move(matrix, nodes, start, direction):
         for dy in range(1, 18):  # Start from 1 to skip initial node
             if dy % 6 != 0:
                 positions.append((x, y + dy))
+        positions.append((x, y + 18))
     elif direction == "DD":
         line = "\\"
         for dx in range(1, 9):  # Start from 1 to skip initial node
             dy = dx  # Equal step for Down-Right
             if dx % 3 != 0:
                 positions.append((x + dx, y + dy))
+
+        positions.append((x+9, y + 9))
+
     elif direction == "DL":
         line = "/"
         for dx in range(1, 9):  # Start from 1 to skip initial node
             dy = dx  # Equal step for Down-Left
             if dx % 3 != 0:
                 positions.append((x + dx, y - dy))
-
+        positions.append((x+9, y - 9))
+    last_px, last_py = positions[-1]
     # Validate all positions and update the matrix if valid
-    if all(is_valid_move(matrix, px, py) for px, py in positions):
+    if all(is_valid_move(matrix, px, py) for px, py in positions) and  matrix[last_px][last_py] == "●":
+        positions.pop()
         for px, py in positions:
             matrix[px][py] = line
         return True
@@ -192,14 +198,21 @@ def switch_player(current_player):
 def max_connections(side_length):
     conn = 0
     for i in range(side_length, 2*side_length - 1):
-        conn+=2*i+i-1
-    conn+=2*side_length-1
+        conn+=2*(i-1)+4*i
+    conn+=2*(side_length-1)
+    print(str(conn) + " Maksimalni broj tkonekcija je.")
     return conn
 
 
 def end_of_game(matrix, count, side_length):
+    max_triangles = 0
+    for i in range(side_length, 2 * side_length - 1):
+        max_triangles += 2 * i - 1
+
+    print(str(max_triangles) + " Maksimalni broj trouglova je.")
+
     if count >= max_triangles:
-        print("Kraj igre! Maksimalni broj trouglova je dostignut.")
+        print(str(count) + " Kraj igre! Maksimalni broj trouglova je dostignut.")
         return True
     else:
         p = 0
@@ -212,9 +225,11 @@ def end_of_game(matrix, count, side_length):
                         p += 1
                     if (is_valid_move(matrix, i, j + 1) and matrix[i][j + 1] == "-"):
                         p += 1
-        if p == max_connections(side_length):
+        conn =max_connections(side_length)
+        if p == conn:
             print("Kraj igre! Maksimalni broj gumica je razvucen")
             return True
+        print(str(p)+" trenutne stranice")
         return False
 
 
@@ -222,27 +237,27 @@ def end_of_game(matrix, count, side_length):
 
 
 # Main
-
+#
+#
 # matrix_str = """          ●-----●-----●-----●
-#           / \\  /\\  /\\  /\\
-#          / O \\/  \\/  \\/  \\
+#          / \\   / \\   / \\   / \\
+#         / O \\ /   \\ /   \\ /   \\
 #        ●-----●-----●-----●-----●
-#        / \\ O / \\ X /\\  /\\  /\\
-#       / O \\ / X \\ /  \\/  \\/  \\
+#       / \\ O / \\ X / \\   / \\   / \\
+#      / O \\ / X \\ /   \\ /   \\ /   \\
 #     ●-----●-----●-----●-----●-----●
-#     / \\   / \\ O / \\ /\\  /\\  /\\
-#    /   \\/   \\ /   \\/  \\/  \\/  \\
+#    / \\   / \\ O / \\   / \\   / \\   / \\
+#   /   \\ /   \\ /   \\ /   \\ /   \\ /   \\
 #  ●-----●-----●-----●-----●-----●-----●
-#        /     / \\
-#       /     /   \\
-#     ●     ●     ●     ●     ●     ●
-#
-#
-#        ●     ●     ●     ●     ●
-#
-#
-#           ●     ●     ●     ● """
-#
+#   \\   / \\   / \\   / \\   / \\   / \\   /
+#    \\ /   \\ /   \\ /   \\ /   \\ /   \\ /
+#     ●-----●-----●-----●-----●-----●
+#      \\   / \\   / \\   / \\   / \\   /
+#       \\ /   \\ /   \\ /   \\ /   \\ /
+#        ●-----●-----●-----●-----●
+#         \\   / \\   / \\   / \\   /
+#          \\ /   \\ /   \\ /   \\ /
+#           ●-----●-----●-----● """
 # # Parsiraj matricu
 #
 # matrix, nodes = parse_matrix(matrix_str)
@@ -258,10 +273,6 @@ if 3 < side_length < 9:
     print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
     print(f"Visina matrice: {len(matrix)}")
 
-
-    max_triangles =0
-    for i in range(side_length,2*side_length-2):
-         max_triangles+=2*side_length-1
     player_choice = input("Ko igra prvi (čovek/računar)? ").strip().lower()
     while player_choice not in ["covek", "racunar"]:
         player_choice = input("Unesite 'čovek' ili 'računar': ").strip().lower()
@@ -287,8 +298,11 @@ if 3 < side_length < 9:
                 start, direction = move.split()
                 valid = play_move(matrix, nodes, start, direction)
                 if valid:
-                    symbols[current_player]["count"]=draw_triangle(matrix, symbols[current_player]["symbol"],symbols[current_player]["count"],max_triangles)  # Dodavanje simbola
+                    symbols[current_player]["count"]=draw_triangle(matrix, symbols[current_player]["symbol"],symbols[current_player]["count"])  # Dodavanje simbola
                     print_board(matrix,yp)
+                    if end_of_game(matrix, symbols[current_player]["count"], side_length):
+                        print(f"Pobedio je {current_player}!")
+                        break
                     current_player = switch_player(current_player)
             except ValueError:
                 print("Unesite potez u ispravnom formatu!")
@@ -298,9 +312,9 @@ if 3 < side_length < 9:
                 start, direction = move.split()
                 valid = play_move(matrix, nodes, start, direction)
                 if valid:
-                    symbols[current_player]["count"]= draw_triangle(matrix, symbols[current_player]["symbol"],symbols[current_player]["count"],max_triangles)  # Dodavanje simbola
+                    symbols[current_player]["count"]= draw_triangle(matrix, symbols[current_player]["symbol"],symbols[current_player]["count"])  # Dodavanje simbola
                     print_board(matrix,yp)
-                    if end_of_game(matrix, symbols[current_player]["count"], max_triangles, side_length):
+                    if end_of_game(matrix, symbols[current_player]["count"], side_length):
                         print(f"Pobedio je {current_player}!")
                         break
                     current_player = switch_player(current_player)
