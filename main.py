@@ -3,20 +3,18 @@ from game_logic import play_move, switch_player, draw_triangle, end_of_game
 
 # Main deo aplikacije
 
-
-#
 # matrix_str = """          ●-----●-----●-----●
-#           / \
-#          / O \
+#          / \\
+#         / O \\
 #        ●-----●-----●-----●     ●
-#        / \ O / \ X /
-#       / O \ / X \ /
+#       / \\ O / \\ X /
+#      / O \\ / X \\ /
 #     ●-----●-----●-----●     ●     ●
-#     /     / \ O / \
-#    /     /   \ /   \
+#    /     / \\ O / \\
+#   /     /   \\ /   \\
 #  ●     ●     ●     ●     ●     ●     ●
-#        /     / \
-#       /     /   \
+#       /     / \\
+#      /     /   \\
 #     ●     ●     ●     ●     ●     ●
 #
 #
@@ -30,7 +28,7 @@ from game_logic import play_move, switch_player, draw_triangle, end_of_game
 # print_board(matrix,9)
 # print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
 # print(f"Visina matrice: {len(matrix)}")
-# #
+#
 side_length = int(input("Unesite dužinu stranice heksagona: "))
 if 3 < side_length < 9:
     matrix, nodes = draw_hexagon(side_length)

@@ -74,7 +74,7 @@ def end_of_game(matrix, count, side_length):
     for i in range(side_length, 2 * side_length - 1):
         max_triangles += 2 * i - 1
 
-    print(str(max_triangles) + " Maksimalni broj trouglova je.")
+#    print(str(max_triangles) + " Maksimalni broj trouglova")
 
     if count >= max_triangles:
         print(str(count) + " Kraj igre! Maksimalni broj trouglova je dostignut.")
@@ -94,5 +94,5 @@ def end_of_game(matrix, count, side_length):
         if p == conn:
             print("Kraj igre! Maksimalni broj gumica je razvucen")
             return True
-        print(str(p)+" trenutne stranice")
+#        print(str(p)+" trenutne stranice")
         return False
