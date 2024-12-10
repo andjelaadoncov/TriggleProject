@@ -1,10 +1,23 @@
 #OVDE SE NALAZI SVE STO SE TICE LOGIKE SAME IGRE, POTEZA I PROVERE VALIDNOSTI, KRAJA IGRE...
 from utilities import max_connections
 
+# Praćenje svih zauzetih čvorova
+zauzeti_cvorovi = set()
+
 def is_valid_move(matrix, x, y):
     return 0 <= x < len(matrix) and 0 <= y < len(matrix[0])
 
+#funkcija koja proverava da se ne poklapa potez
+def is_valid_rubber_band(positions):
+    global zauzeti_cvorovi
+
+    if all((px, py) in zauzeti_cvorovi for px, py in positions):
+        print("Ovaj potez je već odigran (svi čvorovi zauzeti)!")
+        return False
+    return True
+
 def play_move(matrix, nodes, start, direction):
+    global zauzeti_cvorovi
     directions = {"D", "DD", "DL"}  # desno, dole desno, dole levo
 
     if start not in nodes or direction not in directions:
@@ -39,13 +52,17 @@ def play_move(matrix, nodes, start, direction):
         positions.append((x+9, y - 9))
     last_px, last_py = positions[-1]
 
-    if all(is_valid_move(matrix, px, py) for px, py in positions) and  matrix[last_px][last_py] == "●":
-        positions.pop()
+    if (all(is_valid_move(matrix, px, py) for px, py in positions) and
+            matrix[last_px][last_py] == "●" and
+            is_valid_rubber_band(positions)):
+        # Ako je potez validan, dodaje čvorove u zauzete i ažurira matricu
+        zauzeti_cvorovi.update(positions)  # Dodaj sve čvorove ovog poteza u zauzete
+        positions.pop()  # Uklanja poslednju poziciju (čvor)
         for px, py in positions:
             matrix[px][py] = line
         return True
     else:
-        print("Potez izlazi izvan granica ili prelazi nepostojeći čvor!")
+        print("Potez nije validan!")
         return False
 
 def draw_triangle(matrix, symbol, count):
