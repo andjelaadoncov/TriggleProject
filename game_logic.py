@@ -83,8 +83,8 @@ def draw_triangle(matrix, symbol, count):
     return count
 
 
-def switch_player(current_player):
-    return "racunar" if current_player == "covek" else "covek"
+def switch_player(current_player, player1, player2):
+    return player1 if current_player == player2 else player2
 
 def end_of_game(matrix, count, side_length):
     max_triangles = 0
