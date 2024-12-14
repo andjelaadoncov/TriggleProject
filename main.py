@@ -1,34 +1,8 @@
 from board import draw_hexagon, print_board, parse_matrix
-from game_logic import play_move, switch_player, draw_triangle, end_of_game
+from game_logic import play_move, switch_player, draw_triangle, end_of_game, pass_board_state
 
 # Main deo aplikacije
 
-# matrix_str = """          ●-----●-----●-----●
-#          / \\
-#         / O \\
-#        ●-----●-----●-----●     ●
-#       / \\ O / \\ X /
-#      / O \\ / X \\ /
-#     ●-----●-----●-----●     ●     ●
-#    /     / \\ O / \\
-#   /     /   \\ /   \\
-#  ●     ●     ●     ●     ●     ●     ●
-#       /     / \\
-#      /     /   \\
-#     ●     ●     ●     ●     ●     ●
-#
-#
-#        ●     ●     ●     ●     ●
-#
-#
-#           ●     ●     ●     ● """
-# # Parsiraj matricu
-#
-# matrix, nodes = parse_matrix(matrix_str)
-# print_board(matrix,9)
-# print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
-# print(f"Visina matrice: {len(matrix)}")
-#
 side_length = int(input("Unesite dužinu stranice heksagona: "))
 if 3 < side_length < 9:
     matrix, nodes = draw_hexagon(side_length)
@@ -71,6 +45,11 @@ if 3 < side_length < 9:
 
     current_player = first_player
     print_board(matrix,yp)
+
+    #ODAVDE KRECU POTEZI ZA FIKSNA STANJA ---> ZA SAD
+    moves_input = "a1 d, a2 dd, b3 dl, c3 d".strip().upper()
+    moves = moves_input.split(", ")
+    current_player = pass_board_state(moves, matrix, yp, nodes, first_player, second_player, symbols, side_length)
 
     while True:
         print(f"Na potezu: {current_player} ({symbols[current_player]['symbol']})")

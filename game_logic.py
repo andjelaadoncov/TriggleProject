@@ -1,5 +1,6 @@
 #OVDE SE NALAZI SVE STO SE TICE LOGIKE SAME IGRE, POTEZA I PROVERE VALIDNOSTI, KRAJA IGRE...
 from utilities import max_connections
+from board import print_board
 
 # Praćenje svih zauzetih čvorova
 zauzeti_cvorovi = set()
@@ -113,3 +114,27 @@ def end_of_game(matrix, count, side_length):
             return True
 #        print(str(p)+" trenutne stranice")
         return False
+
+
+def pass_board_state(moves, matrix, yp, nodes, player1, player2, symbols, side_length):
+    current_player = player1
+    for move in moves:
+        try:
+            start, direction = move.split()
+            valid = play_move(matrix, nodes, start, direction)
+            if valid:
+                symbols[current_player]["count"] = draw_triangle(matrix, symbols[current_player]["symbol"],
+                                                                 symbols[current_player]["count"])
+                print_board(matrix, yp)
+                print(f"{current_player} ({symbols[current_player]['symbol']}) je igrao: {move}")
+                if end_of_game(matrix, symbols[current_player]["count"], side_length):
+                    print(f"Pobedio je {current_player}!")
+                    break
+
+                current_player = switch_player(current_player, player1, player2)
+            else:
+                print(f"Potez {move} nije validan! Preskače se.")
+        except ValueError:
+            print(f"Potez {move} nije u ispravnom formatu! Preskače se.")
+
+    return current_player
