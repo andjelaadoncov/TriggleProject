@@ -1,8 +1,9 @@
 #OVDE SE NALAZI SVE STO SE TICE LOGIKE SAME IGRE, POTEZA I PROVERE VALIDNOSTI, KRAJA IGRE...
+
 from utilities import max_connections
 from board import print_board
 
-# Praćenje svih zauzetih čvorova
+# Pracenje svih zauzetih cvorova
 zauzeti_cvorovi = set()
 
 def is_valid_move(matrix, x, y):
@@ -13,11 +14,11 @@ def is_valid_rubber_band(positions):
     global zauzeti_cvorovi
 
     if all((px, py) in zauzeti_cvorovi for px, py in positions):
-        print("Ovaj potez je već odigran (svi čvorovi zauzeti)!")
+        print("Ovaj potez je vec odigran (svi cvorovi zauzeti)!")
         return False
     return True
 
-def play_move(matrix, nodes, start, direction):
+def play_move(matrix, nodes, start, direction, helper = False):
     global zauzeti_cvorovi
     directions = {"D", "DD", "DL"}  # desno, dole desno, dole levo
 
@@ -56,9 +57,11 @@ def play_move(matrix, nodes, start, direction):
     if (all(is_valid_move(matrix, px, py) for px, py in positions) and
             matrix[last_px][last_py] == "●" and
             is_valid_rubber_band(positions)):
-        # Ako je potez validan, dodaje čvorove u zauzete i ažurira matricu
-        zauzeti_cvorovi.update(positions)  # Dodaj sve čvorove ovog poteza u zauzete
-        positions.pop()  # Uklanja poslednju poziciju (čvor)
+        # Ako je potez validan, dodaje cvorove u zauzete i azurira matricu
+        if(helper == False):
+            zauzeti_cvorovi.update(positions)  # Dodaj sve cvorove ovog poteza u zauzete
+
+        positions.pop()  # Uklanja poslednju poziciju (cvor)
         for px, py in positions:
             matrix[px][py] = line
         return True
@@ -133,19 +136,20 @@ def pass_board_state(moves, matrix, yp, nodes, player1, player2, symbols, side_l
 
                 current_player = switch_player(current_player, player1, player2)
             else:
-                print(f"Potez {move} nije validan! Preskače se.")
+                print(f"Potez {move} nije validan! Preskace se.")
         except ValueError:
-            print(f"Potez {move} nije u ispravnom formatu! Preskače se.")
+            print(f"Potez {move} nije u ispravnom formatu! Preskace se.")
 
     return current_player
 
 def possible_states(matrix, nodes):
     states={}
     directions = {"D", "DD", "DL"}
+    helper = True
     for cvor in nodes:
         for dir in directions:
             matrix_copy = [row[:] for row in matrix]
-            if not play_move(matrix_copy, nodes, cvor, dir):
+            if not play_move(matrix_copy, nodes, cvor, dir, helper):
                 continue
             states[(cvor, dir)] = matrix_copy
     return states
@@ -153,7 +157,7 @@ def possible_states(matrix, nodes):
 def print_states(states,y):
     for move, mat in states.items():
         cvor, dir = move
-        print(f"Potez: Čvor = {cvor}, Pravac = {dir}")
+        print(f"Potez: Cvor = {cvor}, Pravac = {dir}")
         print("Matrica nakon poteza:")
         print_board(mat,y)
         print("-" * 20)

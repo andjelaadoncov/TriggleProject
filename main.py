@@ -1,29 +1,29 @@
-from board import draw_hexagon, print_board, parse_matrix
+from board import draw_hexagon, print_board
 from game_logic import play_move, switch_player, draw_triangle, end_of_game, pass_board_state, possible_states, print_states
 
 # Main deo aplikacije
 
-side_length = int(input("Unesite dužinu stranice heksagona: "))
+side_length = int(input("Unesite duzinu stranice heksagona: "))
 if 3 < side_length < 9:
     matrix, nodes = draw_hexagon(side_length)
     xp, yp = nodes["A1"]
-    print(f"Širina matrice: {len(matrix[0])}")  # Broj kolona
+    print(f"Sirina matrice: {len(matrix[0])}")  # Broj kolona
     print(f"Visina matrice: {len(matrix)}")
 
     # Izbor tipa igre
-    game_mode = input("Da li želite da igrate protiv čoveka ili računara? (covek/racunar): ").strip().lower()
+    game_mode = input("Da li zelite da igrate protiv coveka ili racunara? (covek/racunar): ").strip().lower()
     while game_mode not in ["covek", "racunar"]:
         game_mode = input("Unesite 'covek' ili 'racunar': ").strip().lower()
 
     # Izbor simbola za prvog igrača
-    first_symbol = input("Koji simbol želite da koristite (X/O)? ").strip().upper()
+    first_symbol = input("Koji simbol zelite da koristite (X/O)? ").strip().upper()
     while first_symbol not in ["X", "O"]:
         first_symbol = input("Unesite 'X' ili 'O': ").strip().upper()
 
     second_symbol = "O" if first_symbol == "X" else "X"
 
     # Izbor ko igra prvi
-    first_player_choice = input("Da li želite da igrate prvi? (da/ne): ").strip().lower()
+    first_player_choice = input("Da li zelite da igrate prvi? (da/ne): ").strip().lower()
     while first_player_choice not in ["da", "ne"]:
         first_player_choice = input("Unesite 'da' ili 'ne': ").strip().lower()
 
@@ -56,7 +56,7 @@ if 3 < side_length < 9:
     while True:
         print(f"Na potezu: {current_player} ({symbols[current_player]['symbol']})")
         if current_player.startswith("covek"):
-            move = input("Unesite potez (format: čvor direkcija, npr. A1 D): ").strip().upper()
+            move = input("Unesite potez (format: cvor direkcija, npr. A1 D): ").strip().upper()
             if move == "EXIT":
                 break
             try:
@@ -73,9 +73,9 @@ if 3 < side_length < 9:
             except ValueError:
                 print("Unesite potez u ispravnom formatu!")
         else:
-            # Logika za potez računara
-            # Ovde može biti implementirana logika za računara -----> za sada idalje implementirana kao za obicnog coveka NEDOVRSENOOO
-            move = input("Unesite potez (format: čvor direkcija, npr. A1 D): ").strip().upper()
+            # Logika za potez racunara
+            # Ovde moze biti implementirana logika za racunar -----> za sada idalje implementirana kao za obicnog coveka NEDOVRSENOOO
+            move = input("Unesite potez (format: cvor direkcija, npr. A1 D): ").strip().upper()
             if move == "EXIT":
                 break
             try:
