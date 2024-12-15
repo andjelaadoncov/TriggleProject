@@ -1,5 +1,4 @@
 #OVDE SE NALAZI SVE STO SE TICE LOGIKE SAME IGRE, POTEZA I PROVERE VALIDNOSTI, KRAJA IGRE...
-#from main import direction
 from utilities import max_connections
 from board import print_board
 
@@ -153,8 +152,8 @@ def possible_states(matrix, nodes):
 
 def print_states(states,y):
     for move, mat in states.items():
-        cvor, dir = move  # Ključ se sastoji od čvora i pravca
+        cvor, dir = move
         print(f"Potez: Čvor = {cvor}, Pravac = {dir}")
         print("Matrica nakon poteza:")
         print_board(mat,y)
-        print("-" * 20)  # Razdvajanje između stanja
+        print("-" * 20)
