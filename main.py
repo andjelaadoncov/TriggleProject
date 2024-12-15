@@ -1,5 +1,5 @@
 from board import draw_hexagon, print_board, parse_matrix
-from game_logic import play_move, switch_player, draw_triangle, end_of_game, pass_board_state
+from game_logic import play_move, switch_player, draw_triangle, end_of_game, pass_board_state, possible_states, print_states
 
 # Main deo aplikacije
 
@@ -47,10 +47,12 @@ if 3 < side_length < 9:
     print_board(matrix,yp)
 
     #ODAVDE KRECU POTEZI ZA FIKSNA STANJA ---> ZA SAD
-    moves_input = "a1 d, a2 dd, b3 dl, c3 d".strip().upper()
+    moves_input = "a1 d, a1 dd, a1 dl, a2 dl, a2 dd, a3 dd, a3 dl, b1 d, b1 dd, b1 dl, b2 d, b2 dd, b2 dl, b3 dl, b4 dd, b4 dl, c3 d, c3 dd, c3 dl, c3 d".strip().upper()
     moves = moves_input.split(", ")
     current_player = pass_board_state(moves, matrix, yp, nodes, first_player, second_player, symbols, side_length)
-
+    print(f"Moguca stanja za {current_player} ({symbols[current_player]['symbol']}): ")
+    states=possible_states(matrix, nodes)
+    print_states(states,yp)
     while True:
         print(f"Na potezu: {current_player} ({symbols[current_player]['symbol']})")
         if current_player.startswith("covek"):

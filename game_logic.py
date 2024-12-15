@@ -1,4 +1,5 @@
 #OVDE SE NALAZI SVE STO SE TICE LOGIKE SAME IGRE, POTEZA I PROVERE VALIDNOSTI, KRAJA IGRE...
+#from main import direction
 from utilities import max_connections
 from board import print_board
 
@@ -125,8 +126,8 @@ def pass_board_state(moves, matrix, yp, nodes, player1, player2, symbols, side_l
             if valid:
                 symbols[current_player]["count"] = draw_triangle(matrix, symbols[current_player]["symbol"],
                                                                  symbols[current_player]["count"])
-                print_board(matrix, yp)
                 print(f"{current_player} ({symbols[current_player]['symbol']}) je igrao: {move}")
+                print_board(matrix, yp)
                 if end_of_game(matrix, symbols[current_player]["count"], side_length):
                     print(f"Pobedio je {current_player}!")
                     break
@@ -138,3 +139,22 @@ def pass_board_state(moves, matrix, yp, nodes, player1, player2, symbols, side_l
             print(f"Potez {move} nije u ispravnom formatu! Preskače se.")
 
     return current_player
+
+def possible_states(matrix, nodes):
+    states={}
+    directions = {"D", "DD", "DL"}
+    for cvor in nodes:
+        for dir in directions:
+            matrix_copy = [row[:] for row in matrix]
+            if not play_move(matrix_copy, nodes, cvor, dir):
+                continue
+            states[(cvor, dir)] = matrix_copy
+    return states
+
+def print_states(states,y):
+    for move, mat in states.items():
+        cvor, dir = move  # Ključ se sastoji od čvora i pravca
+        print(f"Potez: Čvor = {cvor}, Pravac = {dir}")
+        print("Matrica nakon poteza:")
+        print_board(mat,y)
+        print("-" * 20)  # Razdvajanje između stanja
