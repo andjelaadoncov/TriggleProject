@@ -18,12 +18,12 @@ def is_valid_rubber_band(positions):
         return False
     return True
 
-def play_move(matrix, nodes, start, direction, helper = False):
+def play_move(matrix, nodes, start, direction, helper = False, showMessage = False):
     global zauzeti_cvorovi
     directions = {"D", "DD", "DL"}  # desno, dole desno, dole levo
 
     if start not in nodes or direction not in directions:
-        #print("Nevalidan potez!")
+        print("Nevalidan potez! Pokusajte ponovo.")
         return False
 
 
@@ -54,20 +54,29 @@ def play_move(matrix, nodes, start, direction, helper = False):
         positions.append((x+9, y - 9))
     last_px, last_py = positions[-1]
 
-    if (all(is_valid_move(matrix, px, py) for px, py in positions) and
-            matrix[last_px][last_py] == "●" and
-            is_valid_rubber_band(positions)):
-        # Ako je potez validan, dodaje cvorove u zauzete i azurira matricu
-        if(helper == False):
-            zauzeti_cvorovi.update(positions)  # Dodaj sve cvorove ovog poteza u zauzete
-
-        positions.pop()  # Uklanja poslednju poziciju (cvor)
-        for px, py in positions:
-            matrix[px][py] = line
-        return True
-    else:
-        #print("Potez nije validan!")
+    if not all(is_valid_move(matrix, px, py) for px, py in positions):
+        if showMessage:
+            print("Nevalidan potez! Neki deo gumice izlazi van table, pokusajte ponovo.")
         return False
+
+    if matrix[last_px][last_py] != "●":
+        if showMessage:
+            print("Nevalidan potez! Neki deo gumice izlazi van table, pokusajte ponovo.")
+        return False
+
+    if not is_valid_rubber_band(positions):
+        if showMessage:
+            print("Nevalidan potez! Ovaj potez je vec odigran, pokusajte ponovo.")
+        return False
+
+    if not helper:
+        zauzeti_cvorovi.update(positions)
+
+    positions.pop()  # Uklanja poslednju poziciju (cvor)
+    for px, py in positions:
+        matrix[px][py] = line
+
+    return True
 
 def draw_triangle(matrix, symbol, count):
     for i in range(len(matrix)):
@@ -164,10 +173,11 @@ def print_states(states,y):
 
 
 def evaluate_state(matrix, player_symbol, opponent_symbol):
+    #inicijalni skorovi za igrace
     player_score = 0
     opponent_score = 0
 
-    # Osnovni bodovi za trouglove (najveća težina)
+    # najvise poena se ostvara na osvajanje trougla
     triangle_value = 100
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
@@ -176,21 +186,21 @@ def evaluate_state(matrix, player_symbol, opponent_symbol):
             elif matrix[i][j] == opponent_symbol:
                 opponent_score += triangle_value
 
-    # Bonus za povezane trouglove
+    # bonus poeni za povezane trouglove
     connected_bonus = 20
     player_connected = count_connected_triangles(matrix, player_symbol)
     opponent_connected = count_connected_triangles(matrix, opponent_symbol)
     player_score += player_connected * connected_bonus
     opponent_score += opponent_connected * connected_bonus
 
-    # Bonus za kontrolu teritorije
+    # bonus poeni za kontrolu teritorije
     territory_bonus = 10
     player_territory = evaluate_territory_control(matrix, player_symbol)
     opponent_territory = evaluate_territory_control(matrix, opponent_symbol)
     player_score += player_territory * territory_bonus
     opponent_score += opponent_territory * territory_bonus
 
-    # Bonus za potencijalne trouglove
+    # bonus za potencijalne trouglove koji mogu da se osvoje u sledecim potezima
     potential_bonus = 30
     player_potential = count_possible_triangles(matrix, player_symbol)
     opponent_potential = count_possible_triangles(matrix, opponent_symbol)
@@ -201,15 +211,13 @@ def evaluate_state(matrix, player_symbol, opponent_symbol):
 
 
 def count_connected_triangles(matrix, symbol):
-    """
-    Računa broj povezanih trouglova istog igrača.
-    Povezani trouglovi dele bar jednu ivicu ili teme.
-    """
+    # ova fja racuna broj povezanih trouglova istog igraca
+    # povezani trouglovi dele bar jednu ivicu ili teme
     connected_count = 0
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
             if matrix[i][j] == symbol:
-                # Proveri susedne trouglove (gore, dole, levo, desno)
+                # proveri susedne trouglove (gore, dole, levo, desno)
                 neighbors = [
                     (i - 2, j), (i + 2, j),  # gore/dole
                     (i, j - 2), (i, j + 2),  # levo/desno
@@ -223,32 +231,32 @@ def count_connected_triangles(matrix, symbol):
                             matrix[ni][nj] == symbol):
                         connected_count += 1
 
-    return connected_count // 2  # Delimo sa 2 jer smo svaku vezu brojali dvaput
+    return connected_count // 2  # delimo sa 2 jer smo svaku vezu brojali dvaput
 
 
 def evaluate_territory_control(matrix, symbol):
-    """
-    Procenjuje kontrolu teritorije na osnovu:
-    1. Broja trouglova u centralnom delu table
-    2. Broja blokiranih poteza protivnika
-    3. Broja slobodnih pozicija oko trouglova igrača
-    """
-    territory_score = 0
-    center_bonus = 2  # Bonus za centralne pozicije
 
-    # Pronađi centar matrice
+    # fja kojom procenjujemo koliko teritorije kontrolise igrac
+    # bonus ako je trougao blizu centra
+    # bonus za slobodna polja oko sebe
+    # bonus ako blokira protivnika
+
+    territory_score = 0
+    center_bonus = 2  #
+
+    # pronalazi centar matrice
     center_i = len(matrix) // 2
     center_j = len(matrix[0]) // 2
 
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
             if matrix[i][j] == symbol:
-                # Bonus za blizinu centru
+                # bonus za blizinu centru
                 distance_to_center = abs(i - center_i) + abs(j - center_j)
                 if distance_to_center < len(matrix) // 3:
                     territory_score += center_bonus
 
-                # Bonus za slobodne pozicije oko trougla
+                #  susedi oko trougla najblizi
                 neighbors = [
                     (i - 1, j), (i + 1, j),
                     (i, j - 1), (i, j + 1),
@@ -259,22 +267,22 @@ def evaluate_territory_control(matrix, symbol):
                     if (0 <= ni < len(matrix) and
                             0 <= nj < len(matrix[0])):
                         if matrix[ni][nj] == " ":
+                            # ako je slobodno, plus 1
                             territory_score += 1
                         elif matrix[ni][nj] not in ["-", "\\", "/", "●"]:
-                            # Bonus za blokiranje protivnika
+                            # ako se tu nalazi protivnički trougao, bonus za blokiranje
                             territory_score += 3
 
     return territory_score
 
 def count_possible_triangles(matrix, player_symbol):
-    """
-    Funkcija koja računa koliko trouglova može biti osvojeno u narednom potezu.
-    """
+    #fja koja racuna koliko trouglova moze biti osvojeno u narednom potezu
+
     count = 0
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
             if matrix[i][j] == " ":
-                # Proverava da li se trougao može formirati
+                # proverava da li trougao moze da se formira
                 if (is_valid_move(matrix, i - 1, j + 1) and matrix[i - 1][j + 1] == "\\" and
                         is_valid_move(matrix, i - 1, j - 1) and matrix[i - 1][j - 1] == "/" and
                         is_valid_move(matrix, i + 1, j) and matrix[i + 1][j] == "-"):
@@ -287,9 +295,9 @@ def count_possible_triangles(matrix, player_symbol):
 
 
 def minimax_alpha_beta(matrix, nodes, depth, alpha, beta, maximizing_player, player_symbol, opponent_symbol):
-    """
-    Min-Max algoritam sa alfa-beta odsecanjem.
-    """
+    # min-Max algoritam sa alfa-beta odsecanjem
+
+    # ako smo dostigli maksimalnu dubinu ili je kraj igre mora da se evaluira stanje
     if depth == 0 or end_of_game(matrix, 0, len(matrix) // 3):
         return evaluate_state(matrix, player_symbol, opponent_symbol), None
 
@@ -297,13 +305,14 @@ def minimax_alpha_beta(matrix, nodes, depth, alpha, beta, maximizing_player, pla
     best_move = None
 
     if maximizing_player:
+        # racunar pokusava da maksimizuje svoju evaluaciju
         max_eval = float('-inf')
         for move, new_state in possible_moves.items():
-            # Izračunaj trenutni broj trouglova koji se mogu osvojiti ovim potezom
+            # izracunaj trenutni broj trouglova koji se mogu osvojiti ovim potezom
             current_eval = count_possible_triangles(new_state, player_symbol)
 
             eval_score, _ = minimax_alpha_beta(new_state, nodes, depth - 1, alpha, beta, False, player_symbol, opponent_symbol)
-            total_eval = current_eval + eval_score  # Dodaj trenutno osvojene trouglove
+            total_eval = current_eval + eval_score  # dodaj trenutno osvojene trouglove
 
             if total_eval > max_eval:
                 max_eval = total_eval
@@ -313,6 +322,7 @@ def minimax_alpha_beta(matrix, nodes, depth, alpha, beta, maximizing_player, pla
                 break
         return max_eval, best_move
     else:
+        # protivnik minimizuje evaluaciju
         min_eval = float('inf')
         for move, new_state in possible_moves.items():
             eval_score, _ = minimax_alpha_beta(new_state, nodes, depth - 1, alpha, beta, True, player_symbol, opponent_symbol)

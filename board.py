@@ -45,9 +45,9 @@ def draw_hexagon(side_length):
         jj+=1
 
     nodes = OrderedDict(sorted(nodes.items()))
-    print("Pozicije tačaka u matrici:")
-    for node_label, (i, j) in nodes.items():
-        print(f"{node_label}: red = {i}, kolona = {j}")
+    #print("Pozicije tacaka u matrici:")
+    #for node_label, (i, j) in nodes.items():
+        #print(f"{node_label}: red = {i}, kolona = {j}")
     return matrix, nodes
 
 def print_board(matrix,y):

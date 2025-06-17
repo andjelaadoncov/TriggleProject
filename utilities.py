@@ -6,3 +6,11 @@ def max_connections(side_length):
     conn+=2*(side_length-1)
 #    print(str(conn) + " Maksimalni broj konekcija")
     return conn
+
+def get_depth_based_on_board_size(side_length):
+    if side_length in [4, 5]:
+        return 3
+    elif side_length in [6, 7, 8]:
+        return 2
+    else:
+        return 1
